@@ -28,7 +28,6 @@ A deep learning system for detecting pneumonia from chest X-ray images using Eff
 - **Threshold optimization** for recall-precision tradeoff
 - **REST API** with FastAPI for integration
 - **Web UI** with Streamlit for easy interaction
-- **Docker support** for containerized deployment
 - **ONNX export** for production inference
 
 ## Live Demo
@@ -156,9 +155,6 @@ pneumonia-detection/
 ├── data/
 │   ├── raw/               # Original chest X-ray dataset
 │   └── processed/         # Preprocessed data splits
-├── docker/                 # Docker configuration
-│   ├── Dockerfile
-│   └── docker-compose.yml
 ├── models/                 # Trained model checkpoints
 │   └── best_model.pt
 ├── notebooks/              # Jupyter notebooks
@@ -261,16 +257,6 @@ API Endpoints:
 - `POST /predict` - Get prediction
 - `POST /predict/gradcam` - Get prediction with Grad-CAM
 
-### Docker
-
-```bash
-# Build and run
-cd docker
-docker-compose up --build
-
-# Access at http://localhost:8501
-```
-
 ## Model Architecture
 
 ```
@@ -322,7 +308,7 @@ EfficientNet-B0 (pretrained on ImageNet)
 - **Explainability**: Grad-CAM (pytorch-grad-cam)
 - **API**: FastAPI, Pydantic
 - **Web UI**: Streamlit
-- **Deployment**: Docker, Hugging Face Spaces
+- **Deployment**: Hugging Face Spaces
 - **Data Analysis**: pandas, numpy, matplotlib, seaborn
 
 
