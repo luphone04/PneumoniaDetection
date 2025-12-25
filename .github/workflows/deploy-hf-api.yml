@@ -1,0 +1,27 @@
+name: Deploy API to HF Spaces
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'hf_api/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Push to HF Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git clone https://RichardLu:$HF_TOKEN@huggingface.co/spaces/RichardLu/PneumoniaAPI hf_space
+          cp -r hf_api/* hf_space/
+          cd hf_space
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+          git add .
+          git diff --staged --quiet || git commit -m "Auto-deploy from GitHub: ${{ github.sha }}"
+          git push
