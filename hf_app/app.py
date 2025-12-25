@@ -188,8 +188,25 @@ if model_loaded:
             type=["jpg", "jpeg", "png"]
         )
 
+        # Sample images
+        st.subheader("🖼️ Or Try Sample Images")
+        sample_col1, sample_col2 = st.columns(2)
+        with sample_col1:
+            if st.button("Normal Sample", use_container_width=True):
+                st.session_state.sample = "samples/normal_sample.jpeg"
+        with sample_col2:
+            if st.button("Pneumonia Sample", use_container_width=True):
+                st.session_state.sample = "samples/pneumonia_sample.jpeg"
+
+    # Determine which image to use
+    image = None
     if uploaded_file is not None:
         image = Image.open(uploaded_file).convert("RGB")
+        st.session_state.sample = None  # Clear sample when uploading
+    elif "sample" in st.session_state and st.session_state.sample:
+        image = Image.open(st.session_state.sample).convert("RGB")
+
+    if image is not None:
 
         with col1:
             st.image(image, caption="Uploaded X-Ray", use_container_width=True)
