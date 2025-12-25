@@ -250,6 +250,6 @@ if model_loaded:
 
                 st.warning("**Disclaimer:** For educational purposes only. Consult a healthcare professional.")
 
-# Footer
+# Footers
 st.markdown("---")
 st.markdown("<p style='text-align:center;color:#888;'>Built with PyTorch & Streamlit</p>", unsafe_allow_html=True)
