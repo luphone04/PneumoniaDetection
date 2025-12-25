@@ -32,7 +32,8 @@ A deep learning system for detecting pneumonia from chest X-ray images using Eff
 
 ## Live Demo
 
-Try the model: [https://huggingface.co/spaces/RichardLu/PneumoniaDetection](https://huggingface.co/spaces/RichardLu/PneumoniaDetection)
+- **Web UI**: [https://huggingface.co/spaces/RichardLu/PneumoniaDetection](https://huggingface.co/spaces/RichardLu/PneumoniaDetection)
+- **REST API**: [https://huggingface.co/spaces/RichardLu/PneumoniaAPI](https://huggingface.co/spaces/RichardLu/PneumoniaAPI) ([API Docs](https://richardlu-pneumoniaapi.hf.space/docs))
 
 ---
 
@@ -176,32 +177,6 @@ pneumonia-detection/
 ├── requirements.txt        # Python dependencies
 └── README.md
 ```
-
-## Installation
-
-### Prerequisites
-
-- Python 3.11+
-- CUDA (optional, for GPU acceleration)
-
-### Setup
-
-```bash
-# Clone repository
-git clone https://github.com/yourusername/pneumonia-detection.git
-cd pneumonia-detection
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### Dataset
-
-Download the [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia) dataset from Kaggle and extract to `data/raw/`.
 
 ## Usage
 

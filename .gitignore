@@ -48,10 +48,10 @@ ENV/
 data/raw/
 data/processed/
 
-# Model weights (too large for git)
-models/*.pt
+# Model weights (large files)
 models/*.pth
 models/*.onnx
+# Note: best_model.pt is tracked for Render deployment (~16MB)
 
 # Outputs
 outputs/logs/
