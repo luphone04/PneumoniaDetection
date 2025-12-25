@@ -1,5 +1,6 @@
 """
 FastAPI for Pneumonia Detection - Hugging Face Spaces Deployment
+CI/CD enabled - auto-deploys from GitHub
 """
 
 import io
