@@ -69,6 +69,9 @@ wandb/
 *.temp
 text.txt
 
+# Internal planning docs
+PROJECT_PLAN.md
+
 # pytest
 .pytest_cache/
 .coverage
