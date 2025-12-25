@@ -35,6 +35,115 @@ A deep learning system for detecting pneumonia from chest X-ray images using Eff
 
 Try the model: [https://huggingface.co/spaces/RichardLu/PneumoniaDetection](https://huggingface.co/spaces/RichardLu/PneumoniaDetection)
 
+---
+
+## Research & Findings
+
+### 1. Dataset Analysis
+
+**Dataset:** [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia) - 5,863 images
+
+| Split | Normal | Pneumonia | Total |
+|-------|--------|-----------|-------|
+| Train | 1,341 | 3,875 | 5,216 |
+| Val | 8 | 8 | 16 |
+| Test | 234 | 390 | 624 |
+
+**Key Findings:**
+- **Class Imbalance:** 2.89:1 ratio (pneumonia:normal) - required weighted loss
+- **Validation Set Too Small:** Only 16 images - created custom 85/15 stratified split
+- **Variable Image Sizes:** Range from 384x127 to 2572x2663 - standardized to 224x224
+- **Mixed Color Modes:** Both grayscale and RGB - converted all to RGB
+
+![Class Distribution](outputs/figures/class_distribution.png)
+
+### 2. Challenges & Solutions
+
+| Challenge | Solution | Impact |
+|-----------|----------|--------|
+| Class imbalance (2.89:1) | Weighted BCE loss (normal: 1.94, pneumonia: 0.67) | Balanced learning |
+| Small validation set (16 imgs) | Custom stratified split (783 val images) | Reliable validation |
+| Overfitting risk | Dropout (0.3), augmentation, early stopping | Better generalization |
+| Medical domain shift | ImageNet pretrained + fine-tuning | Leveraged transfer learning |
+
+### 3. Training Strategy
+
+**Two-Stage Transfer Learning:**
+
+```
+Stage 1: Feature Extraction (5 epochs)
+├── Freeze EfficientNet backbone
+├── Train only classifier head
+├── LR: 1e-4
+└── Purpose: Adapt classifier to medical domain
+
+Stage 2: Fine-Tuning (10 epochs)
+├── Unfreeze entire network
+├── Train all layers
+├── LR: 1e-5 (lower to preserve pretrained features)
+└── Purpose: Adapt features to X-ray patterns
+```
+
+**Why EfficientNet-B0?**
+- Optimal accuracy/efficiency tradeoff
+- Only 4M parameters (vs ResNet-50's 25M)
+- Suitable for deployment (~16MB model)
+- Compound scaling balances depth, width, resolution
+
+### 4. Data Augmentation Strategy
+
+```python
+# Training augmentations (applied randomly)
+- RandomRotation(10°)      # X-rays can be slightly rotated
+- RandomAffine(translate=5%, scale=95-105%)  # Minor positioning variance
+- ColorJitter(brightness=0.2, contrast=0.2)  # Scanner differences
+- RandomErasing(p=0.1)     # Occlusion robustness
+```
+
+**Why these augmentations?**
+- Medical images shouldn't be flipped (anatomical orientation matters)
+- Rotation limited to 10° (realistic for X-ray positioning)
+- No aggressive transforms that would create unrealistic images
+
+### 5. Threshold Optimization
+
+Default threshold (0.5) vs optimized threshold analysis:
+
+| Threshold | Recall | Precision | F1 Score |
+|-----------|--------|-----------|----------|
+| 0.50 (used) | **98.2%** | 88.0% | 92.8% |
+| 0.89 (optimal F1) | 89.5% | 96.5% | 95.1% |
+
+**Decision:** Keep threshold=0.50 for **high recall (98.2%)**
+
+**Rationale:** In medical screening, false negatives (missed pneumonia) are more dangerous than false positives. A patient incorrectly flagged can get further testing, but a missed case could be fatal.
+
+![Threshold Analysis](outputs/figures/threshold_optimization.png)
+
+### 6. Model Interpretability (Grad-CAM)
+
+Grad-CAM visualizations reveal what the model "sees":
+
+**Correct Predictions:**
+- Pneumonia cases: Model focuses on lung opacity regions (white/cloudy areas)
+- Normal cases: Model shows diffuse attention across clear lung fields
+
+**Error Analysis:**
+- False positives often occur with subtle opacities or image artifacts
+- False negatives tend to be mild/early-stage pneumonia cases
+
+![Grad-CAM Analysis](outputs/figures/gradcam_correct.png)
+
+### 7. Key Learnings
+
+1. **Validation strategy matters** - Original 16-image validation set was unusable
+2. **Class weights are essential** - Without them, model predicted pneumonia 95% of the time
+3. **Transfer learning works** - ImageNet features transfer well to medical imaging
+4. **Threshold choice is domain-dependent** - Optimizing for F1 isn't always best
+5. **Interpretability builds trust** - Grad-CAM helps validate model reasoning
+
+---
+
 ## Project Structure
 
 ```
