@@ -215,22 +215,31 @@ prediction, confidence = predict_image(model, image, device)
 print(f"Prediction: {prediction}, Confidence: {confidence:.2%}")
 ```
 
-### Web UI (Streamlit)
+### REST API
 
+Base URL: `https://richardlu-pneumoniaapi.hf.space`
+
+**Using cURL:**
 ```bash
-streamlit run app/streamlit_app.py
+# Health check
+curl https://richardlu-pneumoniaapi.hf.space/health
+
+# Predict
+curl -X POST "https://richardlu-pneumoniaapi.hf.space/predict" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@chest_xray.jpg"
 ```
 
-### REST API (FastAPI)
+**Using Python:**
+```python
+import requests
 
-```bash
-uvicorn api.main:app --reload
+url = "https://richardlu-pneumoniaapi.hf.space/predict"
+with open("chest_xray.jpg", "rb") as f:
+    response = requests.post(url, files={"file": f})
+print(response.json())
+# {"prediction": "PNEUMONIA", "confidence": 0.94, "probability": 0.94, "processing_time_ms": 245.32}
 ```
-
-API Endpoints:
-- `GET /health` - Health check
-- `POST /predict` - Get prediction
-- `POST /predict/gradcam` - Get prediction with Grad-CAM
 
 ## Model Architecture
 
