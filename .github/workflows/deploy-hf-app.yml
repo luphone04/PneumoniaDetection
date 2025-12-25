@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'hf_app/**'
+      - 'app/**'
+      - 'src/**'
 
 jobs:
   deploy:
@@ -21,12 +22,21 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           git clone https://RichardLu:$HF_TOKEN@huggingface.co/spaces/RichardLu/PneumoniaDetection hf_space
-          cp -r hf_app/* hf_space/
+
+          # Copy modular code
+          cp -r src/ hf_space/
+          cp -r app/* hf_space/
+          mkdir -p hf_space/models
+          cp models/best_model.pt hf_space/models/
+          cp requirements.txt hf_space/
+
+          # Track large files with LFS
           cd hf_space
           git lfs track "*.pt"
           git lfs track "*.jpeg"
           git lfs track "*.jpg"
           git lfs track "*.png"
+
           git config user.email "github-actions@github.com"
           git config user.name "GitHub Actions"
           git add .gitattributes

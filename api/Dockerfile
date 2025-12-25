@@ -13,11 +13,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy app files
-COPY app.py .
+COPY src/ src/
+COPY api/ api/
 COPY models/ models/
 
 # Expose port 7860 (HF Spaces default)
 EXPOSE 7860
 
 # Run the API
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "7860"]

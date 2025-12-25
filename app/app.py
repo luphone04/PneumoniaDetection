@@ -1,7 +1,7 @@
 """
 Streamlit Web UI for Pneumonia Detection.
 
-Run with: streamlit run app/streamlit_app.py
+Run with: streamlit run app/app.py
 """
 
 import sys
@@ -181,11 +181,11 @@ if model_loaded:
 
         # Load sample image if selected
         if use_sample == "normal":
-            sample_path = Path("data/raw/test/NORMAL/IM-0001-0001.jpeg")
+            sample_path = Path(__file__).parent / "samples" / "normal_sample.jpeg"
             if sample_path.exists():
                 uploaded_file = sample_path
         elif use_sample == "pneumonia":
-            sample_path = Path("data/raw/test/PNEUMONIA/person1_virus_6.jpeg")
+            sample_path = Path(__file__).parent / "samples" / "pneumonia_sample.jpeg"
             if sample_path.exists():
                 uploaded_file = sample_path
 
