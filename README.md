@@ -325,9 +325,6 @@ EfficientNet-B0 (pretrained on ImageNet)
 - **Deployment**: Docker, Hugging Face Spaces
 - **Data Analysis**: pandas, numpy, matplotlib, seaborn
 
-## License
-
-MIT License - see [LICENSE](LICENSE) for details.
 
 ## Acknowledgments
 
