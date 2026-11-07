@@ -265,10 +265,9 @@ if model_loaded:
                     </div>
                     """, unsafe_allow_html=True)
 
-                # Metrics row
-                m1, m2, m3 = st.columns(3)
-                with m1:
-                    st.metric("Prediction", pred_class)
+                # Metrics: prediction on its own row so the class name is never clipped
+                st.metric("Prediction", pred_class)
+                m2, m3 = st.columns(2)
                 with m2:
                     st.metric("Confidence", f"{confidence:.1%}")
                 with m3:
