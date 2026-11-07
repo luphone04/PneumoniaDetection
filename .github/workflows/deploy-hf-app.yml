@@ -6,6 +6,9 @@ on:
     paths:
       - 'app/**'
       - 'src/**'
+      - 'requirements-app.txt'
+      - 'models/best_model.pt'
+      - '.github/workflows/deploy-hf-app.yml'
 
 jobs:
   deploy:
@@ -28,7 +31,8 @@ jobs:
           cp -r app/* hf_space/
           mkdir -p hf_space/models
           cp models/best_model.pt hf_space/models/
-          cp requirements.txt hf_space/
+          # The Space installs requirements.txt: ship the pinned, CPU-only demo set
+          cp requirements-app.txt hf_space/requirements.txt
 
           # Track large files with LFS
           cd hf_space

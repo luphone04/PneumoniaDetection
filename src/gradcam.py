@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 
 from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
+from pytorch_grad_cam.utils.model_targets import BinaryClassifierOutputTarget
 
 from .dataset import get_transforms
 from .config import IMAGENET_MEAN, IMAGENET_STD, CLASS_NAMES
@@ -56,9 +57,13 @@ def generate_gradcam(
     pred_class = CLASS_NAMES[1] if prob > 0.5 else CLASS_NAMES[0]
     confidence = prob if prob > 0.5 else 1 - prob
 
-    # Generate Grad-CAM
+    # Generate Grad-CAM for the *predicted* class.
+    # The model has a single logit, so targets=None (argmax over outputs) would
+    # always pick index 0 = the PNEUMONIA logit, even for NORMAL predictions.
+    # BinaryClassifierOutputTarget uses +logit for class 1 and -logit for class 0.
+    target = BinaryClassifierOutputTarget(CLASS_NAMES.index(pred_class))
     cam = get_gradcam(model)
-    grayscale_cam = cam(input_tensor=img_tensor, targets=None)[0]
+    grayscale_cam = cam(input_tensor=img_tensor, targets=[target])[0]
 
     # Create visualization
     rgb_img = denormalize_image(img_tensor[0])

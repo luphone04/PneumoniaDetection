@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import streamlit as st
 import torch
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import time
 
 from src.config import CHECKPOINT_PATH, CLASS_NAMES
@@ -91,6 +91,29 @@ def load_model_cached():
 
 
 # =============================================================================
+# Sample Selection (persisted across reruns)
+# =============================================================================
+# st.button() is only True on the single rerun triggered by its own click, so a
+# local variable would be reset when "Analyze Image" triggers the next rerun.
+# The selection is therefore stored in st.session_state via button callbacks.
+
+SAMPLES_DIR = Path(__file__).parent / "samples"
+SAMPLE_FILES = {
+    "normal": SAMPLES_DIR / "normal_sample.jpeg",
+    "pneumonia": SAMPLES_DIR / "pneumonia_sample.jpeg",
+}
+
+
+def select_sample(name: str):
+    st.session_state["selected_sample"] = name
+
+
+def clear_sample():
+    # A new (or removed) upload replaces the sample selection.
+    st.session_state.pop("selected_sample", None)
+
+
+# =============================================================================
 # Sidebar
 # =============================================================================
 
@@ -162,7 +185,8 @@ if model_loaded:
         uploaded_file = st.file_uploader(
             "Choose a chest X-ray image",
             type=["jpg", "jpeg", "png"],
-            help="Supported formats: JPG, JPEG, PNG"
+            help="Supported formats: JPG, JPEG, PNG",
+            on_change=clear_sample,
         )
 
         # Sample images section
@@ -171,41 +195,44 @@ if model_loaded:
 
         sample_col1, sample_col2 = st.columns(2)
 
-        use_sample = None
         with sample_col1:
-            if st.button("🟢 Normal Sample", width="stretch"):
-                use_sample = "normal"
+            st.button("🟢 Normal Sample", width="stretch",
+                      on_click=select_sample, args=("normal",))
         with sample_col2:
-            if st.button("🔴 Pneumonia Sample", width="stretch"):
-                use_sample = "pneumonia"
+            st.button("🔴 Pneumonia Sample", width="stretch",
+                      on_click=select_sample, args=("pneumonia",))
 
-        # Load sample image if selected
-        if use_sample == "normal":
-            sample_path = Path(__file__).parent / "samples" / "normal_sample.jpeg"
-            if sample_path.exists():
-                uploaded_file = sample_path
-        elif use_sample == "pneumonia":
-            sample_path = Path(__file__).parent / "samples" / "pneumonia_sample.jpeg"
-            if sample_path.exists():
-                uploaded_file = sample_path
+        # A selected sample takes precedence until a new file is uploaded
+        selected_sample = st.session_state.get("selected_sample")
+        image_caption = "Uploaded X-Ray"
+        if selected_sample in SAMPLE_FILES and SAMPLE_FILES[selected_sample].exists():
+            uploaded_file = SAMPLE_FILES[selected_sample]
+            image_caption = f"Sample: {selected_sample.upper()} X-Ray"
 
     with col2:
         st.subheader("🔍 Analysis Results")
         results_placeholder = st.empty()
 
-    # Process image if uploaded
+    # Load image if uploaded or sample selected
+    image = None
     if uploaded_file is not None:
-        # Load image
-        if isinstance(uploaded_file, Path):
+        try:
+            # .convert("RGB") also handles grayscale, RGBA and palette images
             image = Image.open(uploaded_file).convert("RGB")
+        except (UnidentifiedImageError, OSError):
+            with col1:
+                st.error("Could not read this file as an image. "
+                         "Please upload a valid JPG or PNG chest X-ray.")
+
+    if image is not None:
+        if isinstance(uploaded_file, Path):
             st.session_state['image_source'] = str(uploaded_file)
         else:
-            image = Image.open(uploaded_file).convert("RGB")
             st.session_state['image_source'] = uploaded_file.name
 
         # Display uploaded image
         with col1:
-            st.image(image, caption="Uploaded X-Ray", width="stretch")
+            st.image(image, caption=image_caption, width="stretch")
 
         # Analyze button
         with col1:
@@ -250,7 +277,11 @@ if model_loaded:
                 # Grad-CAM visualization
                 st.markdown("---")
                 st.subheader("🔥 Grad-CAM Visualization")
-                st.caption("Highlighted regions show areas that influenced the prediction")
+                st.caption(
+                    f"Highlighted regions most increased the model's score for the "
+                    f"predicted class ({pred_class}). Grad-CAM is a coarse explanation "
+                    f"of the model's attention, not a clinical localisation of disease."
+                )
 
                 gcol1, gcol2 = st.columns(2)
                 with gcol1:

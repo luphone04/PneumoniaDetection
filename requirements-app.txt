@@ -1,0 +1,19 @@
+# Pinned runtime dependencies for the Streamlit demo (local + Hugging Face Space).
+# Checked 2026-11-07:
+#   - Runtime (app + tests): Python 3.11, macOS arm64.
+#   - Resolution only (pip --dry-run in linux/amd64 containers): Python 3.10
+#     (HF Streamlit default) and 3.11 -> torch 2.14.1+cpu, torchvision 0.29.2+cpu,
+#     no nvidia/CUDA/triton packages. The CPU index provides the +cpu wheels.
+# The full development/training environment remains in requirements.txt.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1
+torchvision==0.29.2
+grad-cam==1.5.7
+ttach==0.0.3
+opencv-python-headless==5.0.0.93
+streamlit==1.52.2
+numpy==2.2.6
+pillow==12.3.0
+matplotlib==3.10.9
+scikit-learn==1.7.2
+scipy==1.15.3
