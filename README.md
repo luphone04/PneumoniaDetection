@@ -182,7 +182,10 @@ pneumonia-detection/
 
 ### Web UI (local demo)
 
-`requirements-app.txt` pins the runtime set used by both the local demo and the Hugging Face Space (CPU-only PyTorch). The app and tests were run on Python 3.11 (macOS arm64); for Python 3.10 (the Hugging Face Streamlit default) and Linux x86_64, dependency resolution was checked but the app was not run. `requirements.txt` remains the full development/training environment.
+`requirements-app.txt` pins the runtime set used by both the local demo and the Hugging Face Space (CPU-only PyTorch). `requirements.txt` remains the full development/training environment.
+
+- **Runtime tested:** locally on Python 3.11 (macOS arm64: app, unit tests and browser checks); on the Hugging Face Space on Python 3.13 (Linux x86_64: browser checks of the hosted app).
+- **Dependency resolution only:** Python 3.10 and 3.11 on Linux x86_64 (`pip install --dry-run` in containers; the app was not run there).
 
 ```bash
 python3.11 -m venv .venv
